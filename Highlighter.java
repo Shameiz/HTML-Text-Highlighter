@@ -1,5 +1,6 @@
 import java.io.*;
 import java.lang.*;
+import java.util.Scanner;
 
 public class Highlighter
 {
@@ -50,7 +51,7 @@ public class Highlighter
         }
 
     }
-    
+
     public static boolean checkVoidElement(String sub){
         int selfclosing = sub.indexOf('/');
         int closetag = sub.indexOf('>');
@@ -68,67 +69,80 @@ public class Highlighter
     }
 
     public static void main(String args[]) throws IOException {
-
+        Scanner sc = new Scanner( System.in );
         String line;
+        String inputFile, outputFile;
         int prev=1;//1 for open tag, 0 for close tag
         int flag=0;//1 if there is no opening tag after a closing tag, 0 if otherwise
+        char cmd=' ';
+        do{
+            System.out.print('\u000C');//clear screen
+            
+            System.out.println("Enter the name of the file you would like to input(file has to be in the directory): ");
+            inputFile=sc.nextLine();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("abc.html"))) {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("abc2.html"));
+            System.out.println("\nEnter the name of the file to be created or modified for the output: ");
+            outputFile=sc.nextLine();
 
-            while ((line = br.readLine()) != null) {
-                char [] ar= line.toCharArray();
-                int len = ar.length;
-                for(int x=0; x<ar.length; x++){
+            try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 
-                    if(prev==0 && ar[x]=='>'){
-                        flag=1;
-                    }
+                while ((line = br.readLine()) != null) {
+                    char [] ar= line.toCharArray();
+                    int len = ar.length;
+                    for(int x=0; x<ar.length; x++){
 
-                    else if(ar[x]=='<'){
-                        flag=0;
-                        if (ar[x+1]!='/'){
+                        if(prev==0 && ar[x]=='>'){
+                            flag=1;
+                        }
 
+                        else if(ar[x]=='<'){
+                            flag=0;
+                            if (ar[x+1]!='/'){
+
+                                prev=1;
+                                String tagColor = generateColor();
+                                writer.write("\\color["+tagColor+"]");
+
+                                if(checkVoidElement(line.substring(x+1,ar.length))){
+                                    prev=0;
+                                }
+
+                                else{
+                                    addColor(tagColor);
+                                }
+
+                            }
+                            else{
+
+                                if(prev==0){
+                                    writer.write("\\color["+colors[colorLength-1]+"]");
+                                    removeColor();
+                                }
+                                else{
+                                    prev=0;
+                                    removeColor();
+                                }
+                            }
+
+                        }
+
+                        else if(flag==1 && ar[x]!=' '){
+                            flag=0;
                             prev=1;
-                            String tagColor = generateColor();
-                            writer.write("\\color["+tagColor+"]");
-
-                            if(checkVoidElement(line.substring(x+1,ar.length))){
-                                prev=0;
-                            }
-
-                            else{
-                                addColor(tagColor);
-                            }
-
+                            writer.write("\\color["+colors[colorLength-1]+"]");
                         }
-                        else{
-
-                            if(prev==0){
-                                writer.write("\\color["+colors[colorLength-1]+"]");
-                                removeColor();
-                            }
-                            else{
-                                prev=0;
-                                removeColor();
-                            }
-                        }
-
+                        writer.write(ar[x]);
                     }
 
-                    else if(flag==1 && ar[x]!=' '){
-                        flag=0;
-                        prev=1;
-                        writer.write("\\color["+colors[colorLength-1]+"]");
-                    }
-                    writer.write(ar[x]);
+                    writer.write("\n");
                 }
-
-                writer.write("\n");
+                writer.close(); 
             }
-            writer.close(); 
-        }
-
+            System.out.println("\n"+outputFile+" is now ready!!!");
+            System.out.println("\nPress any key followed by enter (q to exit) to input another file");
+            cmd=sc.nextLine().charAt(0);
+        }while(cmd!='q');
     }
 }
 

@@ -1,0 +1,11 @@
+\color[1E128E]<html>
+    \color[17CD77]<head>
+    \color[A17A55]<title>HTML highlight test page</title>
+    \color[17CD77]</head>
+    \color[41E68E]<body>
+    This is text in the body.
+    \color[4A1418]<br>
+    \color[116CE0]<h1>This is a heading</h1>
+    \color[6E047E]<p>This is a paragraph.</p>
+    \color[41E68E]There is more text in the body after the paragraph. </body>
+\color[1E128E]</html>
